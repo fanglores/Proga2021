@@ -37,8 +37,8 @@ class Image {
 public:
     Image()
     {
-        this->mx = mx;
-        this->my = my;
+        mx = mxt;
+        my = myt;
         img = new DataType[mx * my];
     }
 
@@ -66,8 +66,20 @@ public:
         img[y * mx + x] = value;
     }
 
-    friend ostream& operator<<(ostream&, const Image&);     // Реализовать  для варианта 2
-    Image& operator=(const Image<DataType, mxt, myt>& im)
+    // Реализовать  для варианта 2
+    friend ostream& operator<<(ostream& out, const Image& d1)
+    {
+        for (int i = 0; i < d1.my; i++)
+        {
+            for (int j = 0; j < d1.mx; j++)
+                out << d1.img[i * d1.mx + j] << ' ';
+            out << endl;
+        }
+
+        return out;
+    }
+    
+    Image& operator=(const Image& im)
     {
         if (&im == this) return *this;
 
@@ -81,32 +93,18 @@ public:
     }
 };
 
-template<typename DataType, size_t mxt, size_t myt>
-ostream& operator<<(ostream& out, const Image<DataType, mxt, myt>& d1)
-{
-    for (int i = 0; i < d1.my; i++)
-    {
-        for (int j = 0; j < d1.mx; j++)
-            out << d1.img[i * d1.mx + j] << ' ';
-        out << endl;
-    }
-
-    return out;
-}
-
-
 int main()
 {
     try
     {
-        Image<int, 2, 3> i;
+        Image<int, 2, 3> i(2, 3);
         i.set(0, 0, 1); i.set(1, 0, 2);
         i.set(0, 1, 3); i.set(1, 1, 4);
         i.set(0, 2, 5); i.set(1, 2, 6);
 
         cout << i << endl;
 
-        Image<int, 0, 0> i1; i1 = i;
+        Image<int, 2, 3> i1; i1 = i;
         cout << i1 << endl;
 
         cout << i.get(0, 1) << endl;
