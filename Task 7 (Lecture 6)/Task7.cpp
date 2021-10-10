@@ -1,7 +1,24 @@
 #include <iostream>
 using namespace std;
 
-template <typename T>
+class cls
+{
+private:
+	int data;
+public:
+	cls(int v)
+	{
+		data = v;
+	}
+
+	void print() 
+	{
+		cout << data << endl;
+	}
+};
+
+
+template <class T>
 class SmartPointer
 {
 private:
@@ -71,16 +88,11 @@ private:
 
 int main()
 {
-	int a = 10;
+	SmartPointer<cls> a_sptr(new cls(1));
 
-	SmartPointer<int> a_sptr(&a);
-	SmartPointer<int> b_sptr(&a);
-	SmartPointer<int> m_ptr(new int[5]);
-	
-	cout << *a_sptr << endl;
+	a_sptr->print();
+
+	SmartPointer<int> b_sptr(new int(100));
+
 	cout << *b_sptr << endl;
-
-	delete &b_sptr;
-
-	cout << *a_sptr << endl;
 }
