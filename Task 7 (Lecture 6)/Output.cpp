@@ -8,7 +8,7 @@ void rec_out(vector<int> vc, int n = 0)
 {
 	try
 	{
-		vc[n]++;
+		vc.at(n);
 		cout << n << endl;
 		rec_out(vc, n + 1);
 	}
