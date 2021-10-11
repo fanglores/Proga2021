@@ -20,7 +20,7 @@ void rec_out(vector<int> vc, int n = 0)
 
 int main()
 {
-	vector<int> vect(N, 0);
+	vector<int> vect(N);
 
 	rec_out(vect);
 }
