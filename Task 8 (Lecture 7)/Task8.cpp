@@ -20,28 +20,45 @@ using namespace std;
    - слово - ключ, число упоминаний в тексте - значение
 - Выести слова и число вхождений в тексте
 */
-template<class Tk, class Tv>
-struct Row
+
+template<class K, class V>
+struct HashRow
 {
+	K key;
+	V value;
 
-
+	HashRow() = delete;
+	HashRow(K key, V value)
+	{
+		this->key = key;
+		this->value = value;
+	}
 
 };
 
+template<class V>
 class HashTable
 {
 private:
-
+	int size = 0;
 
 
 public:
 
-	void insert()
+	void encrypt(V value)
 	{
-	
+
+
 	}
 
+	void insert(V value)
+	{
+		
+	}
 
+	void find() {}
+	void update() {}
+	void remove() {}
 
 };
 
@@ -54,5 +71,7 @@ void file_processor()
 
 int main()
 {
+
+
 
 }
