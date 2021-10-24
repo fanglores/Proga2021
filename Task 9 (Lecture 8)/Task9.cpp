@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <ctime>
+#include <mutex>
 using namespace std;
 
 /*
@@ -30,34 +31,55 @@ struct state
 };
 vector <state> states(0);
 
-double M;
+mutex vec_locker;
 
-void modulator()
+void modulator(double m, double h, double v, double dt = 0.01)
 {
+	double t = 0.0;
 
+	while(h > 0)
+	{
+
+
+
+		vec_locker.lock();
+		states.push_back({ t, h, v });
+		this_thread::sleep_for(chrono::milliseconds(10));
+		vec_locker.unlock();
+	}
 }
 
 void printer()
 {
+	while (true)
+	{
+		this_thread::sleep_for(chrono::milliseconds(90));
 
+		vec_locker.lock();
+		state tmp = states.back();
+		this_thread::sleep_for(chrono::milliseconds(10));
+		vec_locker.unlock();
 
+		cout << tmp.t << ' ' << tmp.h << ' ' << tmp.v << endl;
+	}
 }
 
 int main()
 {
-	double v, h;
+	double m, v, h;
+
 	cout << "Mass >> ";
-	cin >> M;
+	cin >> m;
 	cout << "Start height >> ";
 	cin >> h;
 	cout << "Start velocity >> ";
 	cin >> v;
 
 	states.push_back( {0.0, h, v} );
-	delete & v, h;
 	
+	cout << endl << endl << "Time\tHeight\tVelocity" << endl;
 
-	thread thread_m(modulator);
+	thread thread_m(modulator, m, h, v);
 	thread thread_p(printer);
 
 	thread_m.join();
