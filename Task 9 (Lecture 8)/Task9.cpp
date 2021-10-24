@@ -49,7 +49,7 @@ void modulator(double H, double V)
 		if (t >= t0) t = t0;
 
 		h = H + V * t - g * t * t / 2;
-		v = V - g*t;
+		v = V - g * t;
 		t += dt;
 
 		vec_locker.lock();
@@ -88,9 +88,11 @@ int main()
 	cout << "Start velocity >> ";
 	cin >> v;
 
-	states.push_back( {0.0, h, v} );
-	
+	states.push_back({ 0.0, h, v });
+
 	cout << endl << endl << "Time\tHeight\tVelocity" << endl;
+	cout << fixed;
+	cout << setprecision(2) << 0.00 << '\t' << h << '\t' << v << endl;
 
 	thread thread_m(modulator, h, v);
 	thread thread_p(printer);
