@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 using namespace std;
 
 /*
@@ -79,14 +80,38 @@ void printer()
 	} while (tmp.h > 0);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	double v, h;
+	double m, v, h;
 
-	cout << "Start height >> ";
-	cin >> h;
-	cout << "Start velocity >> ";
-	cin >> v;
+	if (argc != 4)
+	{
+		cout << "Arguments!" << endl;
+		return 0;
+	}
+	else
+	{
+		stringstream convertm(argv[1]); 
+		if (!(convertm >> m))
+		{
+			cout << "Mass convertation error!" << endl;
+			return 0;
+		}
+
+		stringstream converth(argv[2]);
+		if (!(converth >> h))
+		{
+			cout << "Height convertation error!" << endl;
+			return 0;
+		}
+
+		stringstream convertv(argv[3]);
+		if (!(convertv >> v))
+		{
+			cout << "Velocity convertation error!" << endl;
+			return 0;
+		}
+	}
 
 	states.push_back({ 0.0, h, v });
 
@@ -99,4 +124,6 @@ int main()
 
 	thread_m.join();
 	thread_p.join();
+
+	return 1;
 }
