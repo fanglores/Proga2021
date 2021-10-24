@@ -1,8 +1,10 @@
 #include <thread>
-#include <vector>
-#include <iostream>
-#include <ctime>
 #include <mutex>
+
+#include <vector>
+
+#include <iostream>
+#include <iomanip>
 using namespace std;
 
 /*
@@ -18,9 +20,13 @@ using namespace std;
 При соударении с землей шарик прилипает к поверхности.
 Программа должна иметь функции:
 - Вычисления положения (h) и параметров движения шарика (v, a) через заданный промежуток времени
-- Позволять записывать параметы движения шарика и метку времении в односвязный спискок
 - Печатать на экран информацию о траектории движения шарика за заданный промежуток времени
 */
+
+const double g = 9.80665;
+const double dt = 0.01;
+const int print_delay = 100;
+const int calc_delay = 50;
 
 //data stored as time, height, velocity
 struct state
@@ -33,43 +39,50 @@ vector <state> states(0);
 
 mutex vec_locker;
 
-void modulator(double m, double h, double v, double dt = 0.01)
+void modulator(double H, double V)
 {
-	double t = 0.0;
+	double h, v, t = dt;
+	double t0 = (V + sqrt(V * V + 2 * g * H)) / g;
 
-	while(h > 0)
+	do
 	{
+		if (t >= t0) t = t0;
 
-
+		h = H + V * t - g * t * t / 2;
+		v = V - g*t;
+		t += dt;
 
 		vec_locker.lock();
 		states.push_back({ t, h, v });
 		this_thread::sleep_for(chrono::milliseconds(10));
 		vec_locker.unlock();
-	}
+
+		//cout << "Whoop!" << endl;
+		this_thread::sleep_for(chrono::milliseconds(calc_delay - 10));
+	} while (h > 0);
 }
 
 void printer()
 {
-	while (true)
+	state tmp;
+	do
 	{
-		this_thread::sleep_for(chrono::milliseconds(90));
+		this_thread::sleep_for(chrono::milliseconds(print_delay - 10));
 
 		vec_locker.lock();
-		state tmp = states.back();
+		tmp = states.back();
 		this_thread::sleep_for(chrono::milliseconds(10));
 		vec_locker.unlock();
 
-		cout << tmp.t << ' ' << tmp.h << ' ' << tmp.v << endl;
-	}
+		cout << fixed;
+		cout << setprecision(2) << tmp.t << '\t' << tmp.h << '\t' << tmp.v << endl;
+	} while (tmp.h > 0);
 }
 
 int main()
 {
-	double m, v, h;
+	double v, h;
 
-	cout << "Mass >> ";
-	cin >> m;
 	cout << "Start height >> ";
 	cin >> h;
 	cout << "Start velocity >> ";
@@ -79,9 +92,9 @@ int main()
 	
 	cout << endl << endl << "Time\tHeight\tVelocity" << endl;
 
-	thread thread_m(modulator, m, h, v);
+	thread thread_m(modulator, h, v);
 	thread thread_p(printer);
 
 	thread_m.join();
-	thread_p.detach();
+	thread_p.join();
 }
