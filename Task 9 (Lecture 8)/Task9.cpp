@@ -91,22 +91,24 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		stringstream convertm(argv[1]); 
-		if (!(convertm >> m))
+		stringstream convert(argv[1]); 
+		if (!(convert >> m))
 		{
 			cout << "Mass convertation error!" << endl;
 			return 0;
 		}
 
-		stringstream converth(argv[2]);
-		if (!(converth >> h))
+		convert.clear();
+		convert.str(argv[2]);
+		if (!(convert >> h))
 		{
 			cout << "Height convertation error!" << endl;
 			return 0;
 		}
 
-		stringstream convertv(argv[3]);
-		if (!(convertv >> v))
+		convert.clear();
+		convert.str(argv[3]);
+		if (!(convert >> v))
 		{
 			cout << "Velocity convertation error!" << endl;
 			return 0;
