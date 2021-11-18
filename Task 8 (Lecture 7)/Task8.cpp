@@ -27,12 +27,6 @@ struct HashNode
 	K key;
 	V value;
 
-	HashNode()
-	{
-		key = -1;
-		value = -1;
-	}
-
 	HashNode(K key, V value)
 	{
 		this->key = key;
@@ -42,10 +36,12 @@ struct HashNode
 };
 
 template<class K, class V>
-struct HashRow
+class HashRow
 {
+public:	
+	V* row;
+	K row_key;
 	int size;
-	HashNode<K, V>* row;
 
 	HashRow()
 	{
@@ -55,53 +51,81 @@ struct HashRow
 	HashRow(HashNode<K,V> node)
 	{
 		size = 1;
-		row = new HashNode<K, V>(node.key, node.value);
+		row_key = node.key;
+
+		row = new V[1];
+		row[0] = node.value;
 	}
 
-	push_back(HashNode<K, V> node)
+	void push_back(HashNode<K, V> node)
 	{
-		HashNode<K,V>* trow = new HashNode<K, V>[size + 1];
-		memcpy(trow, row, size * sizeof(HashNode<K, V>));
-		trow[size] = node;
+		if (size == 0) row_key = node.key;
+		else if (node.key == row_key)
+		{
+			V* trow = new V[size + 1];
+			memcpy(trow, row, size * sizeof(V));
+			trow[size] = node.value;
 
-		row = new HashNode<K, V>[size + 1];
-		
-		memcpy(row, trow, (size + 1) * sizeof(HashNode<K,V>));
-		size++;
+			row = new V[size + 1];
+
+			memcpy(row, trow, (size + 1) * sizeof(V));
+			size++;
+		}
+		else cout << "[RE] Passed wrong node push back to." << endl;
+	}
+
+	void push(HashNode<K, V> node)
+	{
+		size = 1;
+		row_key = node.key;
+
+		row = new V[1];
+		row[0] = node.value;
+	}
+
+	void push(K k,V* val, int sz)
+	{
+		size = sz;
+		row_key = k;
+
+		row = new V[sz];
+		memcpy(row, val, sz * sizeof(V));
+	}
+
+	void print()
+	{
+		for (int i = 0; i < size; i++)
+			cout << row[i] << ' ';
 	}
 
 	~HashRow()
 	{
 		delete[] row;
 	}
+
 };
 
 template<class K, class V>
 class HashTable
 {
-private:
-	HashRow<K, V>* table;
-	int size = 0;
-	const int k = 7, mod = 13;
-
 public:
+	HashRow<K, V>* table;
+	const int k = 7, mod = 10007;
+
+	int size = 0;
 
 	~HashTable()
 	{
 		delete[] table;
 	}
 
-	K encrypt(V value)
+	int encrypt(V value)
 	{
 		int sum = 0;
 		if (typeid(value) == typeid(string))
 		{
 			for (int i = 0; i < value.size(); i++)
 				sum = sum * k + value[i];
-		}
-		else if (typeid(value) == typeid(char) || typeid(value) == typeid(int))
-		{
-			sum = value * k;
 		}
 		else cout << "[RE] Unsupported data type." << endl;
 
@@ -114,17 +138,20 @@ public:
 
 		int i;
 		for (i = 0; i < size; i++) 
-			if (table[i].row[0].key == temp.key) break;
+			if (table[i].row_key == temp.key) break;
 		
 		if (i == size)
 		{
 			HashRow<K, V>* ttab = new HashRow<K,V>[size + 1];
-			memcpy(ttab, table, size * sizeof(HashRow<K,V>));
-			ttab[size] = temp;
-			
+			for (int j = 0; j < size; j++) 
+				ttab[j].push(table[j].row_key, table[j].row, table[j].size);
+			ttab[size].push(temp);
+
 			table = new HashRow<K,V>[size + 1];
 
-			memcpy(table, ttab, (size + 1) * sizeof(HashRow<K,V>));
+			for (int j = 0; j < size + 1; j++)
+				table[j].push(ttab[j].row_key, ttab[j].row, ttab[j].size);
+			
 			size++;
 		}
 		else
@@ -147,15 +174,21 @@ public:
 	{
 		for (int i = 0; i < size; i++)
 		{
-			cout << table[i].row[0].key << '\t';
-			for (int j = 0; j < table[i].size; j++)
-			{
-				cout << table[i].row[j].value << ' ';
-			}
+			cout << table[i].row_key << '\t';
+			table[i].print();
 			cout << endl;
 		}
 	}
 };
+
+template<class K, class V>
+void mymemcpy(HashRow<K, V>* ht1, HashRow<K, V>* ht2)
+{
+	for (int i = 0; i < ht1->size; i++)
+	{
+		memcpy(ht2[i].row, ht1[i].row, ht1[i].size * sizeof(V));
+	}
+}
 
 void file_processor()
 {
@@ -164,12 +197,16 @@ void file_processor()
 
 }
 
+
+
 int main()
 {
 	HashTable<int, string> ht;
 	ht.insert("abc");
 	ht.insert("bcd");
 	ht.insert("cde");
+
+	ht.insert("abc");
 
 	ht.print();
 }
