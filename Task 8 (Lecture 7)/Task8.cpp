@@ -135,12 +135,8 @@ public:
 	void insert(V value)
 	{
 		HashNode<K, V> temp(encrypt(value), value);
-
-		int i;
-		for (i = 0; i < size; i++) 
-			if (table[i].row_key == temp.key) break;
 		
-		if (i == size)
+		if (find_key(temp.key) == size)
 		{
 			HashRow<K, V>* ttab = new HashRow<K,V>[size + 1];
 			for (int j = 0; j < size; j++) 
@@ -155,19 +151,59 @@ public:
 			size++;
 		}
 		else
+			table[find_key(temp.key)].push_back(temp);
+	}
+
+	int find_key(K key) 
+	{
+		int i;
+		for (i = 0; i < size; i++)
+			if (table[i].row_key == key) break;
+		return i;
+	}
+
+	void update(K key)
+	{
+		int i = find_key(key);
+		if (i == size) cout << "[RE] No such keys." << endl;
+		else
 		{
-			table[i].push_back(temp);
+			int sz;
+			cout << "Enter the number of values: ";
+			cin >> sz;
+
+			cout << "\nEnter the values: ";
+			V* val = new V[sz];
+			for (int j = 0; j < sz; j++)
+				cin >> val[j];
+			
+			table[i].push(key, val, sz);
 		}
 	}
 
-	V get(K key) 
+	void remove(K key) 
 	{
-		
-	
-	}
+		int i = find_key(key);
+		if (i == size) cout << "[RE] No such keys." << endl;
+		else 
+		{
+			HashRow<K, V>* ttab = new HashRow<K, V>[size];
+			for (int j = 0; j < size; j++)
+				ttab[j].push(table[j].row_key, table[j].row, table[j].size);
 
-	void update() {}
-	void remove() {}
+			table = new HashRow<K, V>[size - 1];
+
+			int flag = 0;
+			for (int j = 0; j < size; j++)
+				if (j != i)
+				{
+					table[j - flag].push(ttab[j].row_key, ttab[j].row, ttab[j].size);
+				}
+				else flag = 1;
+
+			size--;
+		}
+	}
 
 
 	void print()
@@ -180,15 +216,6 @@ public:
 		}
 	}
 };
-
-template<class K, class V>
-void mymemcpy(HashRow<K, V>* ht1, HashRow<K, V>* ht2)
-{
-	for (int i = 0; i < ht1->size; i++)
-	{
-		memcpy(ht2[i].row, ht1[i].row, ht1[i].size * sizeof(V));
-	}
-}
 
 void file_processor()
 {
@@ -205,8 +232,11 @@ int main()
 	ht.insert("abc");
 	ht.insert("bcd");
 	ht.insert("cde");
+	ht.insert("def");
+	ht.insert("efg");
 
-	ht.insert("abc");
+	ht.update(ht.encrypt("abc"));
+	ht.remove(ht.encrypt("efg"));
 
 	ht.print();
 }
