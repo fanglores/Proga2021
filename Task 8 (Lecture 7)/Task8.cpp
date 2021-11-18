@@ -1,5 +1,7 @@
 #include <string>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 /*
@@ -215,19 +217,54 @@ public:
 			cout << endl;
 		}
 	}
+
+	void print_size()
+	{
+		for (int i = 0; i < size; i++)
+		{
+			cout << table[i].size << '\t';
+			table[i].print();
+			cout << endl;
+		}
+	}
 };
 
-void file_processor()
+void file_processor(const string& filename)
 {
+	fstream txt(filename, fstream::in);
 
+	string str, signs = ".,!?";
+	if (txt.is_open())
+	{
+		HashTable<int, string> ht;
 
+		while (!txt.eof())
+		{
+			txt >> str;
 
+			for(int i = 0; i < str.size(); i++)
+			{
+				if (signs.find(str[i]) != string::npos)
+				{
+					str.erase(i, 1);
+					i--;
+				}
+				else str[i] = tolower(str[i]);
+			}
+
+			if(!str.empty()) ht.insert(str);
+		}
+
+		ht.print_size();
+	}
+	else cout << "[RE] Error while opening txt file." << endl;
 }
 
 
 
-int main()
+int main(int argc, char* argv[])
 {
+	/*
 	HashTable<int, string> ht;
 	ht.insert("abc");
 	ht.insert("bcd");
@@ -239,4 +276,24 @@ int main()
 	ht.remove(ht.encrypt("efg"));
 
 	ht.print();
+	*/
+
+	string filename;
+
+	if (argc != 2)
+	{
+		cout << "Arguments!" << endl;
+		return 0;
+	}
+	else
+	{
+		stringstream convert(argv[1]);
+		if (!(convert >> filename))
+		{
+			cout << "Path convertation error!" << endl;
+			return 1;
+		}
+	}
+
+	file_processor(filename);
 }
