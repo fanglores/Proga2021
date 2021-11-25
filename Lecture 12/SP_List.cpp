@@ -14,8 +14,8 @@ using namespace std;
 
 struct List
 {
-	shared_ptr<List> prev = nullptr;
-	shared_ptr<List> next = nullptr;
+	weak_ptr<List> prev;
+	shared_ptr<List> next;
 	int value;
 
 	List() {}
@@ -30,8 +30,12 @@ void push_back(shared_ptr<List> &h, int v)
 
 		while (cur->next != nullptr) cur = cur->next;
 		
-		cur->next = make_shared<List>(v);
-		cur->next->prev = cur;
+		shared_ptr<List> temp(new List(v));
+		temp->prev = cur;
+
+		cur->next = temp;
+		cur = move(temp);
+
 	}
 	else
 		h = make_shared<List>(v);
@@ -41,13 +45,11 @@ void push_front(shared_ptr<List> &h, int v)
 {
 	if (h)
 	{
-		shared_ptr<List> cur(h);
-
-		while (cur->prev != nullptr) cur = cur->prev;
-
-		cur->prev = make_shared<List>(v);
-		cur->prev->next = cur;
-		swap(cur->prev, h);
+		shared_ptr<List> temp(new List(v));
+		temp->next = h;
+		
+		h->prev = temp;
+		h = move(temp);
 	}
 	else
 		h = make_shared<List>(v);
